@@ -62,7 +62,7 @@ def register():
         #MySQL Cursor
         cur = mysql.connection.cursor()
 
-        cur.execute("INSERT INTO users(fname, lname, username, email, password, age) VALUES(%s, %s, %s, %s, %s, %s)", (fname, lname, email, username, password, age))
+        cur.execute("INSERT INTO users(fname, lname, username, email, password, age) VALUES(%s, %s, %s, %s, %s, %s)", (fname, lname, username, email, password, age))
         
         #Commit to MySQL
         mysql.connection.commit()
@@ -73,7 +73,7 @@ def register():
         flash('You are now registered and can login to see the articles', 'success')
 
 
-        redirect(url_for('index'))
+        redirect(url_for('register'))
     return render_template('register.html', form=form)
 if __name__ == '__main__':
     app.secret_key='secret'
