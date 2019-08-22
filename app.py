@@ -7,11 +7,11 @@ from passlib.hash import sha256_crypt
 app = Flask(__name__)
 
 # Config MySQL
-app.config['MySQL_HOST'] = 'localhost'
-app.config['MySQL_USER'] = 'root'
-app.config['MySQL_PASSWORD'] = 'Alizohair1'
-app.config['MySQL_DB'] = 'flaskapp'
-app.config['MySQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Alizohair1'
+app.config['MYSQL_DB'] = 'flaskapp'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # init MySQL
 mysql = MySQL(app)
