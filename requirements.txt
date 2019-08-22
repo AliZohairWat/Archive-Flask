@@ -1,0 +1,4 @@
+passlib==1.7.1
+Flask==1.0.2
+WTForms==2.2.1
+flask_mysqldb==0.2.0
