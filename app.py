@@ -18,10 +18,12 @@ mysql = MySQL(app)
 
 DummyArticles = Articles()
 
+# Home Page
 @app.route('/')
 def run():
     return render_template('home.html')
 
+# About Page
 @app.route('/about')
 def about():
     return render_template('about.html')
@@ -46,6 +48,7 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
+# User Register
 @app.route('/register', methods=['GET', 'POST'])
 
 def register():
@@ -75,6 +78,59 @@ def register():
 
         redirect(url_for('register'))
     return render_template('register.html', form=form)
+
+# User Login
+@app.route('/login', methods=["GET", "POST"])
+
+def login():
+    if request.method == 'POST':
+        # Get Form Fields
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        #using db to verify password
+        cur = mysql.connection.cursor()
+
+        # Get relevant row based on username
+        row = cur.execute('SELECT * FROM users WHERE username = %s', [username])
+
+        if row > 0:
+            # Get hash
+            data = cur.fetchone()
+            password = data['password']
+
+            # Compare passwords
+            if sha256_crypt.verify(password_candidate, password):
+                #Pass
+                session['logged_in'] = True
+                session['username'] = username
+                
+                flash('You are now logged in', 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                #Wrong Password
+                error = 'Your username or password is incorrect'
+                return render_template('login.html', error=error)
+            # Close db connection
+            cur.close()
+        else:
+            # No such username
+            error = 'Your username or password is incorrect'
+            return render_template('login.html', error=error)
+    return(render_template('login.html'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out. Please come again', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/dashboard', methods = ['GET', 'POST'])
+# Dashboard
+
+def dashboard():
+
+    return render_template('dashboard.html')
 if __name__ == '__main__':
     app.secret_key='secret'
     app.run(debug=True)
