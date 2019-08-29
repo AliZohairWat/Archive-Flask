@@ -3,6 +3,7 @@ from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, IntegerField
 from passlib.hash import sha256_crypt
+from functools import wraps
  
 app = Flask(__name__)
 
@@ -28,10 +29,12 @@ def run():
 def about():
     return render_template('about.html')
 
+# Articles Page
 @app.route('/articles')
 def articles():
     return render_template('articles.html', articles = DummyArticles)
 
+# Individual Article Page
 @app.route('/article/<string:id>/')
 def article(id):
     return render_template('article.html', id=id)
@@ -117,20 +120,32 @@ def login():
             # No such username
             error = 'Your username or password is incorrect'
             return render_template('login.html', error=error)
-    return(render_template('login.html'))
+    return (render_template('login.html'))
 
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized Access', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+# Logout Route
 @app.route('/logout')
 def logout():
     session.clear()
     flash('You are now logged out. Please come again', 'success')
     return redirect(url_for('login'))
 
-@app.route('/dashboard', methods = ['GET', 'POST'])
 # Dashboard
-
+@app.route('/dashboard', methods = ['GET', 'POST'])
+@is_logged_in
 def dashboard():
-
     return render_template('dashboard.html')
+
 if __name__ == '__main__':
     app.secret_key='secret'
     app.run(debug=True)
